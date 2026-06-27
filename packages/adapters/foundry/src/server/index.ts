@@ -16,7 +16,12 @@
  * var cannot silently substitute a different identity.
  */
 
-import type { AdapterExecutionContext, AdapterExecutionResult } from "@paperclipai/adapter-utils";
+import type {
+  AdapterExecutionContext,
+  AdapterExecutionResult,
+  AdapterEnvironmentTestContext,
+  AdapterEnvironmentTestResult,
+} from "@paperclipai/adapter-utils";
 import { DefaultAzureCredential, ManagedIdentityCredential, getBearerTokenProvider } from "@azure/identity";
 import { AzureOpenAI } from "openai";
 
@@ -65,7 +70,7 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
     runId: ctx.runId,
     engagementId,
     deployment,
-    actor: (ctx.agent as Record<string, unknown>)?.id ?? "unknown",
+    actor: ctx.agent.id ?? "unknown",
   };
 
   // Lane check — fail-closed before token acquisition.
@@ -168,11 +173,10 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
   };
 }
 
-export async function testEnvironment(): Promise<{
-  status: "pass" | "warn" | "fail";
-  checks: Array<{ code: string; level: "info" | "warn" | "error"; message: string }>;
-}> {
-  const checks: Array<{ code: string; level: "info" | "warn" | "error"; message: string }> = [];
+export async function testEnvironment(
+  ctx: AdapterEnvironmentTestContext,
+): Promise<AdapterEnvironmentTestResult> {
+  const checks: AdapterEnvironmentTestResult["checks"] = [];
 
   if (!process.env.AZURE_OPENAI_ENDPOINT) {
     checks.push({
@@ -198,7 +202,9 @@ export async function testEnvironment(): Promise<{
   const hasErrors = checks.some((c) => c.level === "error");
   const hasWarns = checks.some((c) => c.level === "warn");
   return {
+    adapterType: ctx.adapterType,
     status: hasErrors ? "fail" : hasWarns ? "warn" : "pass",
     checks,
+    testedAt: new Date().toISOString(),
   };
 }

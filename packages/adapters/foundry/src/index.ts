@@ -12,10 +12,15 @@
  *   - Fail-closed audit: every outcome (success/cancel/fail/refused) emits
  *     exactly one audit event in a finally{} block.
  *
+ * External adapter registration: the main entry exports createServerAdapter()
+ * so Paperclip's plugin-loader can hot-load this package from the adapter-plugin
+ * store (~/.paperclip/adapter-plugins.json) without a server restart.
+ *
  * Register in Paperclip's adapter registry as type = "foundry".
  */
 
-import type { AdapterModelProfileDefinition } from "@paperclipai/adapter-utils";
+import type { AdapterModelProfileDefinition, ServerAdapterModule } from "@paperclipai/adapter-utils";
+import { execute, testEnvironment } from "./server/index.js";
 
 export const type = "foundry";
 export const label = "Azure OpenAI / Foundry (keyless)";
@@ -66,3 +71,29 @@ Lane policy:
   acquired. A deployment not in the allowlist is refused with a LaneViolationError.
 - public_non_sensitive lane is never allowed for Confidential engagements.
 `;
+
+/**
+ * createServerAdapter() — entry point for Paperclip's external adapter plugin loader.
+ *
+ * The plugin loader (server/src/adapters/plugin-loader.ts) imports the main
+ * entry of each plugin and calls createServerAdapter(). This returns a
+ * ServerAdapterModule that Paperclip registers under type "foundry".
+ *
+ * Registration:
+ *   1. Build this package: `pnpm build` in packages/adapters/foundry/
+ *   2. Add to ~/.paperclip/adapter-plugins.json:
+ *        { "packageName": "@securityos/adapter-foundry",
+ *          "localPath": "/path/to/paperclip/packages/adapters/foundry",
+ *          "type": "foundry", "installedAt": "..." }
+ *   3. Restart Paperclip server. The adapter appears in the adapter list as "foundry".
+ */
+export function createServerAdapter(): ServerAdapterModule {
+  return {
+    type,
+    execute,
+    testEnvironment,
+    models,
+    modelProfiles,
+    agentConfigurationDoc,
+  };
+}
