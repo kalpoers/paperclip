@@ -1,0 +1,51 @@
+{
+  "name": "@securityos/adapter-foundry",
+  "version": "0.1.0",
+  "license": "MIT",
+  "description": "Paperclip model-adapter seam for Azure OpenAI / Foundry — keyless, per-engagement, private-endpoint-only.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kalpoers/paperclip",
+    "directory": "packages/adapters/foundry"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./server": "./src/server/index.ts",
+    "./ui": "./src/ui/index.ts"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      },
+      "./server": {
+        "types": "./dist/server/index.d.ts",
+        "import": "./dist/server/index.js"
+      },
+      "./ui": {
+        "types": "./dist/ui/index.d.ts",
+        "import": "./dist/ui/index.js"
+      }
+    },
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts"
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@azure/identity": "^4.6.0",
+    "@paperclipai/adapter-utils": "workspace:*",
+    "openai": "^4.103.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.21",
+    "typescript": "^5.7.3"
+  }
+}

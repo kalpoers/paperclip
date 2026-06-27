@@ -1,0 +1,36 @@
+{
+  "name": "@securityos/aca-jobs-backend",
+  "version": "0.1.0",
+  "description": "Paperclip execution backend that runs each agent run as an ephemeral Azure Container Apps Job with a per-engagement managed identity, keyless secret injection, and deny-by-default egress.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@azure/arm-appcontainers": "^2.1.0",
+    "@azure/identity": "^4.5.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
